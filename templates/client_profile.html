@@ -1,0 +1,127 @@
+
+{% extends 'base.html' %}
+{% load form_tags %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="card-title h5 mb-0">Client Profile</h2>
+            </div>
+            <div class="card-body">
+                <h3 class="h4 mb-3">{{ client.full_name }}</h3>
+                
+                <div class="mb-2">
+                    <strong>Date of Birth:</strong> {{ client.date_of_birth|date:"M d, Y" }}
+                </div>
+                
+                <div class="mb-2">
+                    <strong>Gender:</strong> {{ client.get_gender_display }}
+                </div>
+                
+                <div class="mb-2">
+                    <strong>Contact:</strong> {{ client.contact_number }}
+                </div>
+                
+                <div class="mb-2">
+                    <strong>Address:</strong> <br>
+                    {{ client.address }}
+                </div>
+                
+                <div class="mb-2">
+                    <strong>Client ID:</strong> {{ client.id }}
+                </div>
+                
+                <div class="mt-3">
+                    <a href="{% url 'client_list' %}" class="btn btn-secondary btn-sm">Back to Client List</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="card-title h5 mb-0">API Information</h2>
+            </div>
+            <div class="card-body">
+                <p>Client profile is available via API at:</p>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" value="/api/clients/{{ client.id }}/" readonly>
+                    <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this)">Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="card-title h5 mb-0">Enrolled Programs</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Program</th>
+                                <th>Enrolled Date</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for enrollment in enrollments %}
+                            <tr>
+                                <td>{{ enrollment.program.name }}</td>
+                                <td>{{ enrollment.enrollment_date|date:"M d, Y" }}</td>
+                                <td>{{ enrollment.notes|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center">Client is not enrolled in any programs yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="card-title h5 mb-0">Enroll in Program</h2>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.program.id_for_label }}" class="form-label">Select Program</label>
+                        {{ form.program|add_class:"form-control" }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                        {{ form.notes|add_class:"form-control" }}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Enroll Client</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard(button) {
+    const input = button.previousElementSibling;
+    input.select();
+    document.execCommand("copy");
+    
+    const originalText = button.textContent;
+    button.textContent = "Copied!";
+    setTimeout(() => {
+        button.textContent = originalText;
+    }, 2000);
+}
+</script>
+{% endblock %}

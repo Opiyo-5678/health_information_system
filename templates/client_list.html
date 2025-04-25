@@ -1,0 +1,54 @@
+
+{% extends 'base.html' %}
+{% load form_tags %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="card-title h5 mb-0">Client List</h2>
+        <a href="{% url 'client_register' %}" class="btn btn-light btn-sm">Register New Client</a>
+    </div>
+    <div class="card-body">
+        <form method="get" class="mb-4">
+            <div class="input-group">
+                {{ form.search_query|add_class:"form-control" }}
+                <button type="submit" class="btn btn-primary">Search</button>
+                {% if form.search_query.value %}
+                <a href="{% url 'client_list' %}" class="btn btn-secondary">Clear</a>
+                {% endif %}
+            </div>
+        </form>
+        
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Date of Birth</th>
+                        <th>Gender</th>
+                        <th>Contact</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in clients %}
+                    <tr>
+                        <td>{{ client.full_name }}</td>
+                        <td>{{ client.date_of_birth|date:"M d, Y" }}</td>
+                        <td>{{ client.get_gender_display }}</td>
+                        <td>{{ client.contact_number }}</td>
+                        <td>
+                            <a href="{% url 'client_profile' client.id %}" class="btn btn-primary btn-sm">View Profile</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No clients found. Please register a client first.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
